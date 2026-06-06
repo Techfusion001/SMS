@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Shift Manager | Supabase</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="background-glow"></div>
+
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-center">
+        <div class="brand-mark">SS</div>
+        <p class="eyebrow">Security Shift Manager</p>
+        <h1>Login to your shift records</h1>
+        <p class="muted">GitHub Pages frontend + Supabase database. Your shifts are saved online and linked to your account.</p>
+      </div>
+
+      <form id="authForm" class="auth-form">
+        <label>
+          Email
+          <input type="email" id="authEmail" placeholder="you@example.com" required>
+        </label>
+
+        <label>
+          Password
+          <input type="password" id="authPassword" placeholder="Minimum 6 characters" required>
+        </label>
+
+        <div class="auth-actions">
+          <button class="btn btn-primary" type="button" id="loginBtn">Login</button>
+          <button class="btn btn-light" type="button" id="signupBtn">Create Account</button>
+        </div>
+
+        <p id="authMessage" class="message"></p>
+      </form>
+
+      <div class="setup-warning">
+        <strong>Before use:</strong>
+        Open <code>config.js</code> and add your Supabase URL and anon key.
+      </div>
+    </div>
+  </section>
+
+  <div id="appScreen" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SS</div>
+        <div>
+          <h1>Shift Manager</h1>
+          <p>Online database mode</p>
+        </div>
+      </div>
+
+      <nav>
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#add-shift">Add Shift</a>
+        <a href="#records">Records</a>
+        <a href="#reports">Reports</a>
+      </nav>
+
+      <div class="side-card">
+        <span>Logged in as</span>
+        <strong id="userEmail">...</strong>
+        <small>Records are protected by Supabase login + Row Level Security.</small>
+      </div>
+
+      <button class="btn btn-danger full-width" id="logoutBtn">Logout</button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Security Shift Tracker</p>
+          <h2>Manage shifts, earnings, companies & reports</h2>
+        </div>
+        <div class="actions">
+          <button class="btn btn-light" id="refreshBtn">Refresh</button>
+          <button class="btn btn-light" id="backupBtn">Backup JSON</button>
+        </div>
+      </header>
+
+      <section id="dashboard" class="grid stats">
+        <article class="stat-card">
+          <span>Total Shifts</span>
+          <strong id="totalShifts">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Total Hours</span>
+          <strong id="totalHours">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Gross Pay</span>
+          <strong id="grossPay">£0.00</strong>
+        </article>
+        <article class="stat-card">
+          <span>Pending Payment</span>
+          <strong id="pendingPay">£0.00</strong>
+        </article>
+      </section>
+
+      <section id="add-shift" class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">New record</p>
+            <h3>Add / Edit Shift</h3>
+          </div>
+          <button class="btn btn-light" id="resetFormBtn">Reset Form</button>
+        </div>
+
+        <form id="shiftForm" class="form-grid">
+          <input type="hidden" id="recordId">
+
+          <label>
+            Date
+            <input type="date" id="date" required>
+          </label>
+
+          <label>
+            Shift Name / Site
+            <input type="text" id="shiftName" placeholder="Example: Tesco Night Security" required>
+          </label>
+
+          <label>
+            Company / Agency
+            <input type="text" id="company" placeholder="Example: ABC Security Ltd" required>
+          </label>
+
+          <label>
+            Supervisor Name
+            <input type="text" id="supervisor" placeholder="Who gave/confirmed the shift?">
+          </label>
+
+          <label>
+            Supervisor Contact
+            <input type="text" id="supervisorContact" placeholder="Phone / WhatsApp / Email">
+          </label>
+
+          <label>
+            Location / Premises
+            <input type="text" id="location" placeholder="Store, venue, city">
+          </label>
+
+          <label>
+            Start Time
+            <input type="time" id="startTime" required>
+          </label>
+
+          <label>
+            End Time
+            <input type="time" id="endTime" required>
+          </label>
+
+          <label>
+            Break Minutes
+            <input type="number" id="breakMinutes" min="0" step="5" value="0">
+          </label>
+
+          <label>
+            Rate Per Hour (£)
+            <input type="number" id="rate" min="0" step="0.01" placeholder="Example: 12.00" required>
+          </label>
+
+          <label>
+            Payment Status
+            <select id="paymentStatus">
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Disputed">Disputed</option>
+            </select>
+          </label>
+
+          <label>
+            Payment Received Date
+            <input type="date" id="paymentReceivedDate">
+          </label>
+
+          <label>
+            Shift Type
+            <select id="shiftType">
+              <option value="Retail Security">Retail Security</option>
+              <option value="Door Supervisor">Door Supervisor</option>
+              <option value="Event Security">Event Security</option>
+              <option value="Mobile Patrol">Mobile Patrol</option>
+              <option value="CCTV">CCTV</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+
+          <label>
+            Invoice / Reference No.
+            <input type="text" id="referenceNo" placeholder="Optional">
+          </label>
+
+          <label class="full">
+            Description / Duty Notes
+            <textarea id="description" rows="3" placeholder="Duties, late finish, extra hours, site notes, etc."></textarea>
+          </label>
+
+          <label class="full">
+            Incident Notes
+            <textarea id="incidentNotes" rows="3" placeholder="Aggressive customer, theft, refusal, police call, manager informed, etc."></textarea>
+          </label>
+
+          <label class="full">
+            Expenses / Travel Notes
+            <textarea id="expenses" rows="2" placeholder="Fuel, parking, mileage, train, taxi, food allowance, etc."></textarea>
+          </label>
+
+          <div class="form-summary full">
+            <div>
+              <span>Calculated Hours</span>
+              <strong id="previewHours">0</strong>
+            </div>
+            <div>
+              <span>Estimated Pay</span>
+              <strong id="previewPay">£0.00</strong>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Shift</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="records" class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Saved records</p>
+            <h3>Shift Records</h3>
+          </div>
+          <div class="filters">
+            <input type="month" id="monthFilter">
+            <input type="text" id="searchInput" placeholder="Search company, site, supervisor...">
+            <select id="statusFilter">
+              <option value="">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Disputed">Disputed</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="loadingBox" class="loading hidden">Loading records...</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Shift / Site</th>
+                <th>Company</th>
+                <th>Supervisor</th>
+                <th>Time</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Pay</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="reports" class="panel report-panel">
+        <div>
+          <p class="eyebrow">Export</p>
+          <h3>Download Shift Report</h3>
+          <p class="muted">
+            Export your filtered records as an Excel-readable report. It includes totals, company, supervisor, hours, pay and notes.
+          </p>
+        </div>
+        <div class="report-actions">
+          <button class="btn btn-primary" id="downloadExcelBtn">Download Excel Report</button>
+          <button class="btn btn-light" id="downloadCsvBtn">Download CSV</button>
+          <button class="btn btn-light" id="printReportBtn">Print Report</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
