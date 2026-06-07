@@ -3,5 +3,5 @@
 // Paste your Project URL and anon public key.
 // Never use the service_role key in frontend code.
 
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
+const SUPABASE_URL = "https://buqgvsesvdjwpywjmkfv.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_cmh2PRWonhkaVBqWVAnz-Q_y89Opr1m";

@@ -1,31 +1,36 @@
-# Sentinel Shift OS — Pro Cyberpunk Version
+# Sentinel Shift OS v3 — Expenses + Child Viewer Access
 
-GitHub Pages frontend + Supabase database for security shift management.
+## New features
 
-## New in this version
-- Multipage website: Dashboard, Companies, Add Shift, Shift Records, Reports, Settings
-- Company/agency directory
-- Modular shift form: Shift Details, Report of Shift, Payment & Reference
-- Better reports and exports
-- Cyberpunk futuristic UI
-- Optional browser-generated sound effects
-- Supabase Row Level Security
+### GBP side payments / expenses
+The Add Shift page now includes:
+- Travel Charges GBP
+- Parking Charges GBP
+- Other Claimable Expenses GBP
+- Expense Notes
+- Total Wage
+- Side Payments Total
+- Total Cost = Wage + Travel + Parking + Other
 
-## Setup
-1. Open Supabase SQL Editor.
-2. Paste and run `supabase-schema-v2.sql`.
-3. Open `config.js`.
-4. Add your Supabase Project URL and anon public key.
-5. Upload all files to your GitHub repository.
-6. Enable GitHub Pages from repository settings.
+Reports and exports now show all these values.
 
-## Upgrade from old version
-Run `supabase-schema-v2.sql`. It adds:
-- `security_companies` table
-- `company_id` field in shifts
-- `handover_notes` field in shifts
+### Child / Viewer Access
+New page: `access.html`
 
-Existing old shifts remain. You can add companies and link new shifts to those companies.
+Owner can add a viewer email. That viewer can view companies, shifts and reports, and download reports.
+
+Viewer cannot add, edit, delete, or manage access.
+
+## Required Supabase update
+
+Run `supabase-schema-v3.sql` in Supabase SQL Editor.
+
+## Upload files
+
+Upload all files to GitHub Pages root.
 
 ## Important
-Never put your Supabase service role key in this project. Only use the anon public key.
+
+Keep your existing Supabase URL and anon public key in `config.js`.
+
+Never put service role key inside frontend code.
